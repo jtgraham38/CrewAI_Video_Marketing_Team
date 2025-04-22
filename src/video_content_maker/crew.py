@@ -1,6 +1,9 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import WebsiteSearchTool, YoutubeVideoSearchTool, YoutubeChannelSearchTool
+from langchain_mistralai import ChatMistralAI
+from langchain.embeddings import HuggingFaceEmbeddings
+import os
 
 
 # If you want to run a snippet of code before or after the crew starts,
@@ -21,29 +24,35 @@ class VideoContentMaker():
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
     def brand_strategist(self) -> Agent:
+        embeddings = HuggingFaceEmbeddings(model_name="mistralai/Mistral-7B-Instruct-v0.2")
         return Agent(
             config=self.agents_config['brand_strategist'],
             verbose=True,
-            tools=[WebsiteSearchTool(website_url=self.inputs['website_url']), YoutubeChannelSearchTool(youtube_url=self.inputs['youtube_url'])]
+            tools=[
+                WebsiteSearchTool(embedding_model=embeddings),
+                YoutubeChannelSearchTool(embedding_model=embeddings)
+            ]
         )
 
     @agent
     def email_marketing_manager(self) -> Agent:
+        embeddings = HuggingFaceEmbeddings(model_name="mistralai/Mistral-7B-Instruct-v0.2")
         return Agent(
             config=self.agents_config['email_marketing_manager'],
             verbose=True,
             tools=[
-                YoutubeVideoSearchTool(youtube_url=self.inputs['video_url'])
+                YoutubeVideoSearchTool(embedding_model=embeddings)
             ]
         )
 
     @agent
     def blog_content_writer(self) -> Agent:
+        embeddings = HuggingFaceEmbeddings(model_name="mistralai/Mistral-7B-Instruct-v0.2")
         return Agent(
             config=self.agents_config['blog_content_writer'],
             verbose=True,
             tools=[
-                YoutubeVideoSearchTool(youtube_url=self.inputs['video_url'])
+                YoutubeVideoSearchTool(embedding_model=embeddings)
             ]
         )
 
@@ -80,5 +89,10 @@ class VideoContentMaker():
             tasks=self.tasks, # Automatically created by the @task decorator
             process=Process.sequential,
             verbose=True,
+            llm=ChatMistralAI(
+                model="mistral-large-latest",
+                temperature=0.7,
+                mistral_api_key=os.getenv('MISTRAL_API_KEY')
+            )
             # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
