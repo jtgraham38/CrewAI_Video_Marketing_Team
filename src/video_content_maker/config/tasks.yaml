@@ -1,0 +1,24 @@
+brand_strategy_task:
+  description: >
+    Create a brand strategy for {organization} based on information from their website and social media accounts to drive more sales.
+    Make sure you find any interesting and relevant information given
+    the current year is {current_year}.
+  expected_output: >
+    A brand strategy for {organization}
+  agent: brand_strategist
+
+email_outline_task:
+  description: >
+    Use the brand strategy to create an outline for a marketing email.
+  expected_output: >
+    A fully fledged outline for a marketing email.
+    Formatted as markdown without '```'
+  agent: email_marketing_manager
+
+blog_post_outline_task:
+  description: >
+    Use the brand strategy to create an outline for a blog post.
+  expected_output: >
+    A fully fledged outline for a blog post.
+    Formatted as markdown without '```'
+  agent: blog_content_writer
